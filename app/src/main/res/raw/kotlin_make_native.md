@@ -21,15 +21,15 @@ Kotr-client 是基于ktor理念，开发出的一套跨平台客户端网络框�
 
 首先打开IDEA选择创建Moblie类型项目如下图
 
-![](D:\IdeaProject\Android_IOS_KN\app\src\main\res\raw\选择工程类型.png)
+![](.\chose_project_type.png)
 
 然后选择Java对应版本
 
-![](D:\IdeaProject\Android_IOS_KN\app\src\main\res\raw\选择编译JAVA版本.png)
+![](.\chose_jvm_version.png)
 
 最后输入项目名称构建项目
 
-![](D:\IdeaProject\Android_IOS_KN\app\src\main\res\raw\输入项目名称.png)
+![](.\iput_project_name.png)
 
 ### 工程相关配置讲解
 
@@ -393,6 +393,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
+//运行结果如下：
+//I/KilleTom-Ypz: 
+// NewsData(
+// authorName=知心体育, 
+// category=头条, 
+// date=2020-12-02 01:00, 
+// thumbnailPicS=https://00imgmini.eastday.com/mobile/20201202/20201202010022_bf5a57828edeab26dbca7440cdfa75db_1_mwpm_03200403.jpg, thumbnailPicS02=http://00imgmini.eastday.com/mobile/20201202/20201202010022_bf5a57828edeab26dbca7440cdfa75db_5_mwpm_03200403.jpg, thumbnailPicS03=http://00imgmini.eastday.com/mobile/20201202/20201202010022_bf5a57828edeab26dbca7440cdfa75db_2_mwpm_03200403.jpg, title=比广州恒大还丢人！上港队员踢球态度遭炮轰，这种球员不能进国家队, uniquekey=90a3dbeb77496daeae512e41af409d26, 
+// url=https://mini.eastday.com/mobile/201202010022757.html)
 ```
 
 ## ktor-client的总结
+使用kotr-client 需要注意在公共模块下需要配置好基础依赖，其次在各个平台下配置好对应以实现好的库进行配置依赖。
+
+其次需要注意如下几点:
+
+1. 将`HttpClient`初始化为对应平台的`HttpClient`
+2. 实现好对应平台的协程的`CoroutineDispatcher`
+3. 利用抽象概念统一封装好对公用API网络请求以及结果回调
+4. 简单调用封装好的网络请求实现即可

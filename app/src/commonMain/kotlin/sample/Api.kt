@@ -10,6 +10,7 @@ internal expect val APIDispatcher: CoroutineDispatcher
 
 class Api private constructor() {
 
+//    聚合数据的ApiKey
     private var newsApiKey = "13728f03ef29af183184d6d30dc6ae43"
 
     private suspend fun getNews(type: String = "top"): List<NewsData> {
