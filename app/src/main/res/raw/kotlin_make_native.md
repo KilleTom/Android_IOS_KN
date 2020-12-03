@@ -75,7 +75,7 @@ kotlin {
         commonMain {
             dependencies {
            //此处省略部分代码
-        }
+        }}
 //        公共库测试模块
         commonTest {
             dependencies {
@@ -104,7 +104,8 @@ kotlin {
         }
     }
 }
-
+}
+}
 // IOS native 的一些配置
 task copyFramework {
     def buildType = project.findProperty('kotlin.build.type') ?: 'DEBUG'
@@ -202,6 +203,8 @@ task copyFramework {
 注意：
 
 对应平台模块也必须依赖相关配置，避免平台模块调用common模块代码时无法调用
+本示例代码使用的序列化是用`Kotlinx.Serialization`,目前还支持`Gson`、`Jackson`相应配置请参考：
+`https://ktor.kotlincn.net/clients/http-client/features/json-feature.html`
 
 
 
@@ -283,6 +286,16 @@ data class NewsData(
 
 使用kror作为跨平台网络请求，那么对于一些通用的的网络业务API其实可以封装到一个属于该项目的base Net lib。
 
+在进行代码示例演示前将讲解下跨平台相关的两个关键字`expect`、`actual`
+expect：标记为平台必须实现的对象，而在公用模块也就是`common`模块是expect标记的对象只是一个抽象对象，具体要有相应平台去实现
+actual：对应平台的下将`expect`标识的对象实例化相应平台所应该使用的对象
+如下：
+```kotlin
+//在Common平台声明这个对象是CoroutineDispatcher 但并没有实例化 是一个抽象对象
+internal expect val APIDispatcher: CoroutineDispatcher
+//在Android 平台下 实例化该对象
+internal actual val APIDispatcher: CoroutineDispatcher = Dispatchers.Default
+```
 ```kotlin
 //利用Manager的思想封装一个对HttpClient统一管理的类
 class NetClientManager private constructor() {
@@ -382,33 +395,36 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-     
-     //点击请求网络
+        Sample().checkMe()
+        setContentView(R.layout.activity_main)
+        findViewById<TextView>(R.id.main_text).text = hello()
+        setContentView(R.layout.activity_main)
+        findViewById<TextView>(R.id.main_text).text = hello()
+
         main_text.setOnClickListener {
+
             Api.instance.getNewsResult(dataAction = {
-                Log.i("KilleTom-Ypz", it.toString())
+                Log.i("KilleTom-Ypz", "$it")
+                if (!it.isNullOrEmpty()){
+                    post
+                }
             }, errorAction = {
                 it.printStackTrace()
             })
         }
     }
 }
-//运行结果如下：
-//I/KilleTom-Ypz: 
-// NewsData(
-// authorName=知心体育, 
-// category=头条, 
-// date=2020-12-02 01:00, 
-// thumbnailPicS=https://00imgmini.eastday.com/mobile/20201202/20201202010022_bf5a57828edeab26dbca7440cdfa75db_1_mwpm_03200403.jpg, thumbnailPicS02=http://00imgmini.eastday.com/mobile/20201202/20201202010022_bf5a57828edeab26dbca7440cdfa75db_5_mwpm_03200403.jpg, thumbnailPicS03=http://00imgmini.eastday.com/mobile/20201202/20201202010022_bf5a57828edeab26dbca7440cdfa75db_2_mwpm_03200403.jpg, title=比广州恒大还丢人！上港队员踢球态度遭炮轰，这种球员不能进国家队, uniquekey=90a3dbeb77496daeae512e41af409d26, 
-// url=https://mini.eastday.com/mobile/201202010022757.html)
 ```
-
+启动App效果如下:
+![](.\android_frist_run.png)
+点击Hello Android获取网络数据效果如下:
+![](.\android_request_net_result.png)
 ## ktor-client的总结
 使用kotr-client 需要注意在公共模块下需要配置好基础依赖，其次在各个平台下配置好对应以实现好的库进行配置依赖。
 
 其次需要注意如下几点:
 
 1. 将`HttpClient`初始化为对应平台的`HttpClient`
-2. 实现好对应平台的协程的`CoroutineDispatcher`
+2. 实现好对应平台的协程的`CoroutineDispatcher` 也就是 `expect`、`actual`掌握以及运用
 3. 利用抽象概念统一封装好对公用API网络请求以及结果回调
 4. 简单调用封装好的网络请求实现即可
