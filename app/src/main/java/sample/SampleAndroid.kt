@@ -27,7 +27,12 @@ class MainActivity : AppCompatActivity() {
         main_text.setOnClickListener {
 
             Api.instance.getNewsResult(dataAction = {
-                Log.i("KilleTom-Ypz", it.first().toString())
+                Log.i("KilleTom-Ypz", "$it")
+                if (!it.isNullOrEmpty()){
+                    runOnUiThread {
+                        main_text.text = "first news title was ${it.first().title}"
+                    }
+                }
             }, errorAction = {
                 it.printStackTrace()
             })
